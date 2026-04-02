@@ -48,6 +48,18 @@ def _infer_method(row: pd.Series) -> str:
     return "bitsandbytes"
 
 
+def _short_model_label(model_family: str, max_len: int = 26) -> str:
+    label = str(model_family)
+    replacements = {
+        "Mistral-7B-Instruct-v0.2": "Mistral-7B-v0.2",
+        "Meta-Llama-3-8B-Instruct": "Llama-3-8B-Inst",
+    }
+    label = replacements.get(label, label)
+    if len(label) <= max_len:
+        return label
+    return label[: max_len - 1] + "..."
+
+
 def main() -> None:
     files = sorted(LOGS_DIR.glob("results_*.csv"))
     frames = []
@@ -117,13 +129,31 @@ def main() -> None:
     FIGURES_DIR.mkdir(parents=True, exist_ok=True)
     fig, ax = plt.subplots(figsize=(9, 5.5))
 
-    plot_df = summary.copy()
+    # Plot only matched runs that have more than one quantization method.
+    # This keeps the figure focused on backend comparison and avoids crowded labels.
+    method_counts = (
+        summary.groupby(["model_family", "seed", "temperature"], dropna=False)["quant_method"]
+        .nunique()
+        .reset_index(name="n_methods")
+    )
+    plot_df = summary.merge(
+        method_counts,
+        on=["model_family", "seed", "temperature"],
+        how="left",
+    )
+    plot_df = plot_df[plot_df["n_methods"] >= 2].copy()
+
+    if plot_df.empty:
+        print("No matched multi-method INT4 runs available for plotting.")
+        return
+
     plot_df["run"] = (
-        plot_df["model_family"].astype(str)
-        + " | seed="
+        plot_df["model_family"].map(_short_model_label)
+        + "\n"
+        + "s"
         + plot_df["seed"].astype(str)
         + " | T="
-        + plot_df["temperature"].astype(str)
+        + plot_df["temperature"].map(lambda x: f"{float(x):g}")
     )
 
     sns.barplot(
@@ -131,12 +161,13 @@ def main() -> None:
         x="run",
         y="refusal_rate",
         hue="quant_method",
+        hue_order=["bitsandbytes", "awq", "gptq"],
         ax=ax,
     )
     ax.set_xlabel("Run")
     ax.set_ylabel("Refusal Rate")
     ax.set_title("INT4 Refusal Rate by Quantization Method")
-    ax.tick_params(axis="x", rotation=25)
+    ax.tick_params(axis="x", rotation=0, labelsize=9)
 
     fig.tight_layout()
     figure_path = FIGURES_DIR / "quant_method_refusal_comparison.pdf"
