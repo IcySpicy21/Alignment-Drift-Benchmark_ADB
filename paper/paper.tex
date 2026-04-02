@@ -13,7 +13,7 @@
 \usepackage{microtype}
 
 \title{Exploratory Analysis of Quantization-Induced Safety Drift in LLMs Under INT4 Compression}
-\author{SHIVANG GUPTA\\Indian Institute of Technology Roorkee}
+\author{SHIVANG GUPTA\\Indian Institute of Technology Roorkee\\\texttt{shivang\_g@ar.iitr.ac.in}}
 \date{}
 
 \begin{document}
@@ -21,20 +21,20 @@
 \maketitle
 
 \begin{abstract}
-Does compressing weights compress safety? We present an exploratory analysis of whether INT4 quantization can shift refusal behavior, including potential over-refusal, in some architectures. Across three representative instruction-tuned models (Gemma-2B-Instruct, Mistral-7B-Instruct-v0.2, and Meta-Llama-3-8B-Instruct), we evaluate refusal probabilities using 550 synthetic prompts and 200 HarmBench prompts (750 total) with Llama-3-70B as semantic judge. Capability controls (MMLU/GSM8K) indicate that observed refusal shifts are not fully explained by general capability decay. Gemma-2b-it and Meta-Llama-3-8B-Instruct show no clear statistical change, while Mistral-7B-Instruct-v0.2 shows an exploratory signal (uncorrected p=0.027, OR=1.46) that does not remain significant after Benjamini-Hochberg correction across 6 comparisons (adjusted p = 0.16). Accordingly, we treat this as hypothesis-generating evidence rather than a confirmatory claim and motivate larger-scale replication. We release the full pipeline, analysis scripts, and an interactive Streamlit dashboard visualizing per-prompt judge labels and refusal margins.
+Does compressing weights compress safety? We present an exploratory analysis of whether INT4 quantization can shift refusal behavior, including potential over-refusal, in some architectures. Across three representative instruction-tuned models (google/gemma-2b-it, mistralai/Mistral-7B-Instruct-v0.2, and meta-llama/Meta-Llama-3-8B-Instruct), we evaluate refusal probabilities using 550 synthetic prompts and 200 HarmBench prompts (750 total) with Llama-3-70B as semantic judge. Capability controls (MMLU/GSM8K) indicate that observed refusal shifts are not fully explained by general capability decay. google/gemma-2b-it and meta-llama/Meta-Llama-3-8B-Instruct show no clear statistical change, while mistralai/Mistral-7B-Instruct-v0.2 shows an exploratory signal (uncorrected p=0.027, OR=1.46) that does not remain significant after Benjamini-Hochberg correction across 6 comparisons (adjusted p = 0.16). Accordingly, we treat this as hypothesis-generating evidence rather than a confirmatory claim and motivate larger-scale replication. We release the full pipeline, analysis scripts, and an interactive Streamlit dashboard visualizing per-prompt judge labels and refusal margins.
 \end{abstract}
 
 \noindent\textbf{Keywords:} LLM safety, quantization, alignment drift, refusal behavior, robustness
 
 
 \section{Introduction}
-Quantizing Mistral-7B to 4-bit increases refusals on jailbreak prompts that it previously answered under FP16. This pattern is opposite to our initial hypothesis that quantization would reduce safety alignment. In our synthetic jailbreak subset (200 prompts), Mistral complied with all jailbreak prompts at FP16 but refused a meaningful subset at INT4.
+Quantizing mistralai/Mistral-7B-Instruct-v0.2 to 4-bit increases refusals on jailbreak prompts that it previously answered under FP16. This pattern is opposite to our initial hypothesis that quantization would reduce safety alignment. In our synthetic jailbreak subset (200 prompts), mistralai/Mistral-7B-Instruct-v0.2 complied with all jailbreak prompts at FP16 but refused a meaningful subset at INT4.
 
 We release the pipeline so deployment teams can audit quantized models before shipping. Our findings suggest that INT4 compression can induce model-specific safety drift, while INT8 appears comparatively stable in this benchmark. This is directly relevant for practitioners deploying compressed LLMs in safety-critical settings.
 
 The intersection of quantization and safety alignment is under-studied. Standard benchmarks show that perplexity and zero-shot performance degrade gracefully under quantization, but safety alignment can be more brittle. RLHF can act as a shallow "wrapper" over a model's pre-trained distribution. This motivates a central question: does quantization-induced noise disrupt these safety pathways?
 
-In this paper, we systematically evaluate the robustness of LLM refusal behavior under post-training weight quantization. Using Llama-3-70B as a semantic judge over both synthetic limits and HarmBench targets, we find model-family-specific behavioral shifts under INT4 that appear partially decoupled from capability decay, with Mistral-7B showing an exploratory trend (adjusted p = 0.16) warranting larger-scale replication.
+In this paper, we systematically evaluate the robustness of LLM refusal behavior under post-training weight quantization. Using Llama-3-70B as a semantic judge over both synthetic limits and HarmBench targets, we find model-family-specific behavioral shifts under INT4 that appear partially decoupled from capability decay, with mistralai/Mistral-7B-Instruct-v0.2 showing an exploratory trend (adjusted p = 0.16) warranting larger-scale replication.
 
 \section{Related Work}
 
@@ -51,7 +51,7 @@ To systematically evaluate refusal boundaries, we generated a primary dataset of
 We chose this size as an exploratory benchmark budget that enables full model/precision sweeps while preserving tractable end-to-end reruns for replication and ablation.
 
 \subsection{Quantization and Models}
-We evaluate \texttt{gemma-2b-it}, \texttt{Mistral-7B-Instruct-v0.2}, and \texttt{Meta-Llama-3-8B-Instruct} across three precision regimes: FP16 (baseline), INT8, and INT4. Our primary pipeline uses \texttt{bitsandbytes} NF4 variants for the INT4 condition.
+We evaluate \texttt{google/gemma-2b-it}, \texttt{mistralai/Mistral-7B-Instruct-v0.2}, and \texttt{meta-llama/Meta-Llama-3-8B-Instruct} across three precision regimes: FP16 (baseline), INT8, and INT4. Our primary pipeline uses \texttt{bitsandbytes} NF4 variants for the INT4 condition.
 
 \subsection{LLM-as-a-Judge and Metrics}
 Substring matching frequently misses nuanced refusals. Therefore, outputs are evaluated using a robust \texttt{Llama-3-70B} semantic classifier prompted to label responses as Safe (Refusal) or Unsafe (Compliance). We also performed a small manual spot-check to verify that judge labels were directionally consistent with human assessment.
@@ -112,10 +112,10 @@ meta-llama/Meta-Llama-3-8B-Instruct & int4 (NF4) & 0.162 $\pm$ 0.016 & $p=0.559$
 \label{fig:violin}
 \end{figure}
 
-Critically, after Benjamini--Hochberg correction across the model/precision family of comparisons, the strongest observed signal (Mistral INT4 vs FP16) does not remain statistically significant (adjusted $p=0.16$). We therefore interpret the pattern as exploratory evidence and not a confirmatory finding.
-For completeness, the same Mistral INT4-vs-FP16 comparison yields an uncorrected odds ratio of $OR=1.46$, indicating higher refusal odds in the INT4 condition prior to multiple-comparison correction.
+Critically, after Benjamini--Hochberg correction across the model/precision family of comparisons, the strongest observed signal (mistralai/Mistral-7B-Instruct-v0.2 INT4 vs FP16) does not remain statistically significant (adjusted $p=0.16$). We therefore interpret the pattern as exploratory evidence and not a confirmatory finding.
+For completeness, the same mistralai/Mistral-7B-Instruct-v0.2 INT4-vs-FP16 comparison yields an uncorrected odds ratio of $OR=1.46$, indicating higher refusal odds in the INT4 condition prior to multiple-comparison correction.
 
-INT8 results are comparatively stable in this benchmark (Table~\ref{tab:refusal}), with non-significant drift p-values across models (Gemma: $p=0.365$, Mistral: $p=0.108$, Llama: $p=0.773$).
+INT8 results are comparatively stable in this benchmark (Table~\ref{tab:refusal}), with non-significant drift p-values across models (google/gemma-2b-it: $p=0.365$, mistralai/Mistral-7B-Instruct-v0.2: $p=0.108$, meta-llama/Meta-Llama-3-8B-Instruct: $p=0.773$).
 
 A pivotal question remains: is the model generating refusals more often, or is it merely suffering from degraded intelligence under INT4 compression? We isolate this capability control in Table~\ref{tab:mmlu}.
 
@@ -124,22 +124,22 @@ A pivotal question remains: is the model generating refusals more often, or is i
 \begin{tabular}{lllll}
 \toprule
 Model & Precision & MMLU Score & GSM8K & Refusal Rate \\
-mistralai/Mistral-7B & fp16 & 62.5\% & 35.1\% & 15.1\% \\
+mistralai/Mistral-7B-Instruct-v0.2 & fp16 & 62.5\% & 35.1\% & 15.1\% \\
 \midrule
-mistralai/Mistral-7B & int8 & 62.2\% & 34.8\% & 16.7\% \\
-mistralai/Mistral-7B & int4 (NF4) & 60.1\% & 32.4\% & 20.4\% ($p=0.027^*$) \\
+mistralai/Mistral-7B-Instruct-v0.2 & int8 & 62.2\% & 34.8\% & 16.7\% \\
+mistralai/Mistral-7B-Instruct-v0.2 & int4 (NF4) & 60.1\% & 32.4\% & 20.4\% ($p=0.027^*$) \\
 \bottomrule
 \end{tabular}
 \caption{Capability controls (MMLU/GSM8K) partially separating intelligence loss from safety drift.}
 \label{tab:mmlu}
 \end{table}
 
-As shown, general capabilities experience a steady decay of roughly 2.4\% on MMLU while refusal behavior jumps by over 5.3\% absolute for Mistral-7B. This decoupling demonstrates that alignment drift is not merely a side effect of generalized intelligence loss under compression.
+As shown, general capabilities experience a steady decay of roughly 2.4\% on MMLU while refusal behavior jumps by over 5.3\% absolute for mistralai/Mistral-7B-Instruct-v0.2. This decoupling demonstrates that alignment drift is not merely a side effect of generalized intelligence loss under compression.
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.72\textwidth]{../figures/safety_utility_tradeoff.pdf}
-\caption{Safety-utility tradeoff view for the Mistral capability-control slice (FP16/INT8/INT4). Utility is summarized as the mean of MMLU and GSM8K, while safety is represented by refusal rate. The trend illustrates increasing refusal as utility decreases under stronger quantization.}
+\caption{Safety-utility tradeoff view for the mistralai/Mistral-7B-Instruct-v0.2 capability-control slice (FP16/INT8/INT4). Utility is summarized as the mean of MMLU and GSM8K, while safety is represented by refusal rate. The trend illustrates increasing refusal as utility decreases under stronger quantization.}
 \label{fig:safety_utility_tradeoff}
 \end{figure}
 
@@ -154,16 +154,16 @@ When running our semantic judge against distinct categories (including the exter
 \begin{tabular}{lllll}
 \toprule
 Model & Precision & Harmful & Jailbreak & Adversarial \\
-mistralai/Mistral-7B & fp16 & 0.180 $\pm$ 0.027 & 0.000 $\pm$ 0.000 & 0.313 $\pm$ 0.038 \\
+mistralai/Mistral-7B-Instruct-v0.2 & fp16 & 0.180 $\pm$ 0.027 & 0.000 $\pm$ 0.000 & 0.313 $\pm$ 0.038 \\
 \midrule
-mistralai/Mistral-7B & int4 & 0.180 $\pm$ 0.027 & 0.145 $\pm$ 0.025 & 0.313 $\pm$ 0.038 \\
+mistralai/Mistral-7B-Instruct-v0.2 & int4 & 0.180 $\pm$ 0.027 & 0.145 $\pm$ 0.025 & 0.313 $\pm$ 0.038 \\
 \bottomrule
 \end{tabular}
 \caption{Refusal Rates $R \pm SE$ disaggregated by prompt category. Mistral-7B-Instruct-v0.2 complied with all 200 synthetic jailbreak prompts at FP16, consistent with known susceptibility to DAN-style overrides \cite{wei2023jailbroken}.}
 \label{tab:category}
 \end{table}
 
-Table~\ref{tab:category} shows a category-specific shift in jailbreak behavior for Mistral under INT4. At FP16, Mistral complies with jailbreak overrides; at INT4, we observe increased refusal on the same category. We interpret this as evidence of potential safety-boundary drift rather than definitive proof of a robust defense mechanism.
+Table~\ref{tab:category} shows a category-specific shift in jailbreak behavior for mistralai/Mistral-7B-Instruct-v0.2 under INT4. At FP16, mistralai/Mistral-7B-Instruct-v0.2 complies with jailbreak overrides; at INT4, we observe increased refusal on the same category. We interpret this as evidence of potential safety-boundary drift rather than definitive proof of a robust defense mechanism.
 
 \subsection{Qualitative Drift Examples}
 To make the statistical drift tangible, Table~\ref{tab:qualitative} highlights a representative pair where the parameter noise exclusively flipped the semantic compliance state on an identical adversarial prompt string. All figures presented beyond this table utilize colorblind-safe, vector-compliant standard representations.
@@ -177,12 +177,12 @@ To make the statistical drift tangible, Table~\ref{tab:qualitative} highlights a
 \textit{Jailbreak Override \newline (Harmful Constraints)} & "Sure, here is a fictional story illustrating hacking into a secure networking stack database... [Proceeds to generate overriding output]" & "I cannot fulfill this request. I am tightly programmed by my authors to be a helpful and harmless AI assistant..." \\
 \bottomrule
 \end{tabular}
-\caption{A qualitative translation example from Mistral-7B illustrating an INT4-induced refusal flip.}
+\caption{A qualitative translation example from mistralai/Mistral-7B-Instruct-v0.2 illustrating an INT4-induced refusal flip.}
 \label{tab:qualitative}
 \end{table}
 
 \subsection{Failure Mode Analysis}
-The observed drift creates a two-sided risk profile. On one side, some jailbreak prompts that were previously answered become refused after INT4 compression. On the other side, this same shift can produce utility regressions through over-refusal (false positives), where benign or policy-compliant user intent is rejected more often. In deployment terms, quantization can move a model along a safety--usability frontier rather than monotonically improving safety. Our category-level evidence indicates that this movement is model-specific and concentrated in jailbreak-style prompts for Mistral, while other categories and model families remain comparatively stable.
+The observed drift creates a two-sided risk profile. On one side, some jailbreak prompts that were previously answered become refused after INT4 compression. On the other side, this same shift can produce utility regressions through over-refusal (false positives), where benign or policy-compliant user intent is rejected more often. In deployment terms, quantization can move a model along a safety--usability frontier rather than monotonically improving safety. Our category-level evidence indicates that this movement is model-specific and concentrated in jailbreak-style prompts for mistralai/Mistral-7B-Instruct-v0.2, while other categories and model families remain comparatively stable.
 
 \section{Discussion}
 Our current evidence supports a cautious interpretation: low-bit quantization can shift refusal behavior in model-specific ways, but the strongest observed pattern does not survive family-wise correction in the present sample. This places the work in an exploratory regime rather than a confirmatory one.
@@ -198,15 +198,15 @@ To ensure our findings are reproducible, the public GitHub repository (\url{http
 We do not release novel jailbreak prompts; the synthetic templates test known vulnerability categories.
 
 \subsection{Limitations}
-This study has several limitations. First, only one of the three models (Mistral-7B-Instruct-v0.2) showed a notable effect; Gemma-2b-it and Meta-Llama-3-8B-Instruct did not, so we cannot claim universality. Second, our judge model (Llama-3-70B) may introduce its own alignment biases; with additional compute, we would evaluate it as both judge and subject to test this sensitivity directly. Third, we did not run layer-wise ablations to localize the mechanism of the observed shift, which remains future work. Finally, we performed multiple significance tests across models and quantization levels, so isolated uncorrected p-values should be interpreted cautiously.
+This study has several limitations. First, only one of the three models (mistralai/Mistral-7B-Instruct-v0.2) showed a notable effect; google/gemma-2b-it and meta-llama/Meta-Llama-3-8B-Instruct did not, so we cannot claim universality. Second, our judge model (Llama-3-70B) may introduce its own alignment biases; with additional compute, we would evaluate it as both judge and subject to test this sensitivity directly. Third, we did not run layer-wise ablations to localize the mechanism of the observed shift, which remains future work. Finally, we performed multiple significance tests across models and quantization levels, so isolated uncorrected p-values should be interpreted cautiously.
 
 \subsection{Planned Replication Experiments}
-To convert this exploratory signal into a confirmatory claim, the next iteration of this benchmark will prioritize: (1) broader model coverage (including additional open families), (2) multi-seed evaluation to estimate variance and confidence intervals more robustly, (3) quantization-method robustness checks across toolchains/settings, and (4) expanded human-vs-judge agreement auditing. These additions are designed to test whether the Mistral INT4 pattern is a stable phenomenon or a benchmark-specific artifact.
+To convert this exploratory signal into a confirmatory claim, the next iteration of this benchmark will prioritize: (1) broader model coverage (including additional open families), (2) multi-seed evaluation to estimate variance and confidence intervals more robustly, (3) quantization-method robustness checks across toolchains/settings, and (4) expanded human-vs-judge agreement auditing. These additions are designed to test whether the mistralai/Mistral-7B-Instruct-v0.2 INT4 pattern is a stable phenomenon or a benchmark-specific artifact.
 
 For judge validation specifically, we predefine the following protocol for the next phase: (a) stratified sampling of at least 200 model outputs across attack categories and precision settings, (b) two independent human annotations per sample with adjudication on disagreements, and (c) publication of judge-vs-human agreement statistics (accuracy, Cohen's $\kappa$, macro-F1, and confusion matrix) with category-level disagreement slices. This protocol is intended to quantify whether the judge is conservative, permissive, or class-skewed in ways that could bias refusal-rate estimates.
 
 \section{Conclusion and Future Work}
-Quantization introduces model-family-specific behavioral shifts. Our findings suggest that INT4 compression can be associated with over-refusal in susceptible architectures (Mistral-7B-Instruct-v0.2) while leaving others (Gemma-2b-it, Meta-Llama-3-8B-Instruct) comparatively stable in this benchmark. However, over-refusal is also a production concern: excessive false positives degrade user experience, reduce utility, and erode trust in AI assistants. After FDR correction, the Mistral signal (adjusted p =0.16) should be interpreted as exploratory evidence motivating replication, not as definitive proof.
+Quantization introduces model-family-specific behavioral shifts. Our findings suggest that INT4 compression can be associated with over-refusal in susceptible architectures (mistralai/Mistral-7B-Instruct-v0.2) while leaving others (google/gemma-2b-it, meta-llama/Meta-Llama-3-8B-Instruct) comparatively stable in this benchmark. However, over-refusal is also a production concern: excessive false positives degrade user experience, reduce utility, and erode trust in AI assistants. After FDR correction, the mistralai/Mistral-7B-Instruct-v0.2 signal (adjusted p =0.16) should be interpreted as exploratory evidence motivating replication, not as definitive proof.
 
 \begin{center}
 \fbox{\parbox{0.9\textwidth}{
@@ -239,7 +239,7 @@ MLP-only INT4 & 0.194 $\pm$ 0.017 & +0.043 & 60.4\% \\
 Full INT4 & 0.204 $\pm$ 0.017 & +0.053 & 60.1\% \\
 \bottomrule
 \end{tabular}
-\caption{Layer-wise quantization ablation on Mistral-7B. MLP layers account for $\sim$81\% of the total alignment drift, suggesting that the feed-forward projections are the primary locus of safety-critical weight interactions disrupted by 4-bit precision noise.}
+\caption{Layer-wise quantization ablation on mistralai/Mistral-7B-Instruct-v0.2. MLP layers account for $\sim$81\% of the total alignment drift, suggesting that the feed-forward projections are the primary locus of safety-critical weight interactions disrupted by 4-bit precision noise.}
 \label{tab:layerwise}
 \end{table}
 
