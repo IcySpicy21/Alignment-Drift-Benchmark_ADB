@@ -1,0 +1,8 @@
+model,precision,temperature,n_seeds,refusal_rate_mean,refusal_rate_std,refusal_rate_ci95_low,refusal_rate_ci95_high
+TheBloke/Mistral-7B-Instruct-v0.2-AWQ,int4,0.7,4,0.0033333333333333335,0.006666666666666667,0.0,0.01
+google/gemma-2b-it,fp16,0.7,5,0.08048484848484848,0.14447803522678998,0.0,0.21381818181818182
+google/gemma-2b-it,int4,0.7,5,0.13333333333333333,0.18257418583505536,0.0,0.26666666666666666
+google/gemma-2b-it,int8,0.7,5,0.06666666666666667,0.14907119849998599,0.0,0.2
+mistralai/Mistral-7B-Instruct-v0.2,fp16,0.7,5,0.0,0.0,0.0,0.0
+mistralai/Mistral-7B-Instruct-v0.2,int4,0.7,5,0.072,0.14654540441636357,0.0,0.2053333333333333
+mistralai/Mistral-7B-Instruct-v0.2,int8,0.7,5,0.0,0.0,0.0,0.0

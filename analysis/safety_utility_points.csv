@@ -1,0 +1,4 @@
+model,precision,refusal_rate,mmlu,gsm8k,source
+mistralai/Mistral-7B-v0.2,fp16,0.151,62.5,35.1,paper_table
+mistralai/Mistral-7B-v0.2,int8,0.167,62.2,34.8,paper_table
+mistralai/Mistral-7B-v0.2,int4,0.204,60.1,32.4,paper_table

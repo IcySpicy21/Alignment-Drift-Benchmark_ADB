@@ -1,0 +1,11 @@
+model_family,seed,temperature,awq,bitsandbytes,delta_awq_minus_bitsandbytes
+Mistral-7B-Instruct-v0.2,11,0.7,,0.0,
+Mistral-7B-Instruct-v0.2,13,0.7,0.0,0.0,0.0
+Mistral-7B-Instruct-v0.2,17,0.7,0.013333333333333334,0.02666666666666667,-0.013333333333333334
+Mistral-7B-Instruct-v0.2,22,0.7,0.0,0.0,0.0
+Mistral-7B-Instruct-v0.2,33,0.7,0.0,0.3333333333333333,-0.3333333333333333
+gemma-2b-it,11,0.7,,0.3333333333333333,
+gemma-2b-it,22,0.7,,0.3333333333333333,
+gemma-2b-it,33,0.7,,0.0,
+gemma-2b-it,44,0.7,,0.0,
+gemma-2b-it,55,0.7,,0.0,

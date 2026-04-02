@@ -8,6 +8,9 @@ from analyze_results import (
 	compute_drift_ratio_with_coverage,
 	compute_margin_coverage,
 )
+from plot_safety_utility_tradeoff import main as plot_safety_utility_tradeoff
+from summarize_quant_methods import main as summarize_quant_methods
+from aggregate_seed_stats import run_aggregation
 from plot_results import (
 	plot_refusal,
 	plot_drift,
@@ -41,3 +44,12 @@ if not margin_df.empty:
 	)
 
 plot_data_completeness(refusal_coverage_df, drift_coverage_df, margin_coverage_df)
+
+# Optional figure: requires analysis/capability_control.csv with mmlu/gsm8k values.
+plot_safety_utility_tradeoff()
+
+# Optional method-robustness summary across INT4 backends (bnb/awq/gptq).
+summarize_quant_methods()
+
+# Also emit seed-level aggregates (mean/std/bootstrap CI) for V2 analyses.
+run_aggregation()

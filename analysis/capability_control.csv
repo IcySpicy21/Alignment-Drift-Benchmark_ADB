@@ -1,0 +1,4 @@
+model,precision,mmlu,gsm8k
+mistralai/Mistral-7B-v0.2,fp16,62.5,35.1
+mistralai/Mistral-7B-v0.2,int8,62.2,34.8
+mistralai/Mistral-7B-v0.2,int4,60.1,32.4

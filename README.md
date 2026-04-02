@@ -21,6 +21,21 @@ Run analysis and regenerate all summary tables and figures:
 python analysis/run_analysis.py
 ```
 
+## GPTQ Fallback (Docker)
+
+If `auto-gptq` fails in your local Python environment (common on Python 3.12/CUDA combinations), use the dedicated GPTQ container:
+
+```bash
+bash scripts/run_gptq_docker.sh
+```
+
+Custom command example:
+
+```bash
+bash scripts/run_gptq_docker.sh \
+	"python evaluation/evaluate_alignment_drift.py --models TheBloke/Mistral-7B-Instruct-v0.2-GPTQ --precision int4 --quant-method gptq --seed 21 --temperature 0.7 --max-prompts 25"
+```
+
 ## Key Outputs
 
 - Logs: `evaluation/logs/results_*.csv`
@@ -53,6 +68,10 @@ python analysis/run_analysis.py
 - Headline metrics: `paper/results_headline_summary.txt`
 - Stage 8 checklist: `paper/STAGE8_SUBMISSION_VISIBILITY.md`
 - arXiv package builder: `scripts/package_arxiv.sh`
+- Phase 2 upgrade checklist: `paper/PHASE2_EXECUTION_CHECKLIST.md`
+- Upload decision rubric: `paper/UPLOAD_DECISION_RUBRIC.md`
+- Multi-seed matrix runner: `scripts/run_v2_matrix.sh`
+- Fast Mistral slice runner: `scripts/run_mistral_fast_slice.sh`
 
 Create arXiv upload package:
 
@@ -63,6 +82,27 @@ bash scripts/package_arxiv.sh
 This generates:
 
 - `paper/arxiv_submission/arxiv_source.tar.gz`
+
+## Phase 2 Upgrade Run
+
+Run the baseline multi-seed matrix (resume-safe by output filename checks in evaluator):
+
+```bash
+bash scripts/run_v2_matrix.sh
+python analysis/run_analysis.py
+```
+
+For fast smoke runs, cap prompts per category:
+
+```bash
+MAX_PROMPTS=5 bash scripts/run_v2_matrix.sh
+```
+
+Fastest targeted slice (Mistral only, 3 seeds x 3 precisions, then analysis):
+
+```bash
+bash scripts/run_mistral_fast_slice.sh
+```
 
 ## Release and Visibility
 

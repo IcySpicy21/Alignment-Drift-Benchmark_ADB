@@ -1,0 +1,2 @@
+n,accuracy,cohen_kappa,macro_f1,num_labels
+200,0.95,0.7241379310344825,0.861111111111111,2

@@ -1,0 +1,5 @@
+model,precision,temperature,n_seeds,drift_ratio_mean,drift_ratio_std,drift_ratio_ci95_low,drift_ratio_ci95_high
+google/gemma-2b-it,int4,0.7,5,0.7649121699907824,1.7103956089162637,0.0,2.2947365099723473
+google/gemma-2b-it,int8,0.7,5,0.19999997105263578,0.44721353077168374,0.0,0.5999999131579073
+mistralai/Mistral-7B-Instruct-v0.2,int4,0.7,3,11111111.11111111,19245008.972987525,0.0,33333333.333333332
+mistralai/Mistral-7B-Instruct-v0.2,int8,0.7,5,0.0,0.0,0.0,0.0
