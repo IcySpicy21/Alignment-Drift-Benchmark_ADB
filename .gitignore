@@ -23,3 +23,6 @@ build/
 coverage/
 htmlcov/
 *.coverage
+*.tar.gz
+*.zip
+*.gz
