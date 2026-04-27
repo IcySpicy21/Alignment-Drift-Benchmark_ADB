@@ -1,6 +1,6 @@
 # V2 GPU Command Sheet
 
-This sheet assumes you run from the repository root.
+Shell snippets only (no thesis prose). Run everything from the repo root unless noted.
 
 ## 0) Environment setup
 

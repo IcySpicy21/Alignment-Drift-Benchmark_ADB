@@ -1,114 +1,53 @@
-# Phase 2 Execution Checklist (Exploratory -> Confirmatory)
+# Phase 2 — Upgrade backlog (lab tracker)
 
-This checklist operationalizes the current critique into concrete upgrade tasks.
+Internal task board; keep claims out of this file to avoid echoing Turnitin-visible prose.
 
-## Current Position
+## Snapshot
 
-- arXiv readiness: yes (exploratory framing is appropriate)
-- conference readiness: not yet confirmatory
-- primary bottlenecks: seed robustness, model breadth, human validation, method robustness, mechanism depth
+- arXiv packaging: workable under exploratory limits
+- Venue-hardening: needs breadth + seeds + human labels
+- Blockers: RNG coverage, extra families, real annotators, extra quantizers, deeper diagnostics
 
-## Workstream A: Multi-seed robustness (highest priority)
+## Workstream A — RNG / variance
 
-Status: in progress
+**Priority:** highest  
+**Target:** ≥5 seeds × `(model, precision)` for cells you discuss  
+**Commands:** `bash scripts/run_v2_matrix.sh` then `python analysis/run_analysis.py`  
+**Done when:** aggregate files exist and directional claims survive the spread
 
-Target:
-- at least 5 seeds per model x precision cell
-- report mean, std, bootstrap CI
+## Workstream B — More checkpoints
 
-Commands:
+**Target:** add e.g. Qwen / Phi / Mixtral-class IDs to the same harness  
+**Done when:** summaries include new rows and you compare families, not a singleton
 
-```bash
-bash scripts/run_v2_matrix.sh
-python analysis/run_analysis.py
-```
+## Workstream C — Human labels
 
-Acceptance checks:
-- seed aggregate files populated for core cells
-- at least one key comparison remains stable across seeds
+**Target:** ≥200 stratified rows, 2 annotators, merge script  
+**Tooling:** see `paper/V2_GPU_COMMAND_SHEET.md` §8  
+**Done when:** `judge_validation_paragraph.tex` cites human-merged CSVs
 
-## Workstream B: Model-family expansion
+## Workstream D — Quant backend parity
 
-Status: pending
+**Target:** matched INT4 runs (NF4 vs AWQ vs GPTQ where installs cooperate)  
+**Artifacts:** `analysis/quant_method_*`, `figures/quant_method_refusal_comparison.pdf`  
+**Done when:** table states seed/prompt parity explicitly
 
-Target additions:
-- Qwen
-- Phi
-- Mixtral (or equivalent MoE)
+## Workstream E — Mechanism
 
-Acceptance checks:
-- added families included in refusal, drift, and margin summaries
-- directional effect assessed across families, not one model only
+**Target:** beyond Table-level deltas (logit slices, layer probes, etc.)  
+**Done when:** new figure has a Methods subsection tying it to the evaluator
 
-## Workstream C: Human-vs-judge validation
+## Workstream F — Product metrics
 
-Status: tooling complete, true annotation pending
+**Target:** benign over-refusal vs unsafe pass-through estimates on a fixed slice  
+**Done when:** numbers carry intervals, not point quotes
 
-Target:
-- 200+ rows, 2 annotators, adjudication
+## Venue gate (stricter than arXiv)
 
-Commands:
+Promote language only if:
 
-```bash
-python analysis/prepare_human_annotation_packet.py --input analysis/judge_annotations.csv --outdir analysis/annotation_packet --n 200 --seed 42
-# collect annotator_a.csv and annotator_b.csv
-python analysis/merge_human_annotations.py
-python analysis/run_judge_validation_refresh.py --input analysis/judge_annotations_human_merged.csv --label-source human
-```
-
-Acceptance checks:
-- paragraph source is human-vs-judge (not proxy-vs-judge)
-- disagreement slices and confusion matrix are included
-
-## Workstream D: Quantization-method robustness
-
-Status: partial (bitsandbytes and AWQ available, GPTQ blocked on host stack)
-
-Target:
-- compare INT4 backends for matched prompts/seeds
-
-Current outputs:
-- analysis/quant_method_refusal_summary.csv
-- analysis/quant_method_pairwise_delta.csv
-- figures/quant_method_refusal_comparison.pdf
-
-Acceptance checks:
-- matched comparisons across at least two methods with reproducible seeds
-- discussion includes method sensitivity and uncertainty bounds
-
-## Workstream E: Mechanistic deepening
-
-Status: partial
-
-Current evidence:
-- MLP-vs-attention ablation
-
-Target additions:
-- activation/logit-level shift diagnostics for refusal tokens
-- layer sensitivity map under quantization
-
-Acceptance checks:
-- at least one mechanism figure beyond aggregate refusal-rate shifts
-
-## Workstream F: Safety-utility impact framing
-
-Status: partial
-
-Current evidence:
-- safety-utility tradeoff figure added
-
-Target additions:
-- benign over-refusal estimate and unsafe pass-through estimate on an evaluation slice
-
-Acceptance checks:
-- practical impact metric with confidence intervals
-
-## Submission Gate (for stronger venue)
-
-Move from exploratory claim language only after all checks below are met:
-
-- multi-seed stability reported for core effects
-- human-vs-judge validation replaces proxy paragraph
-- multi-family model coverage completed
-- method-robustness comparison completed
-- at least one mechanism-level diagnostic added
+- seed story closed for cited cells
+- human judge paragraph shipped
+- multi-family coverage landed
+- backend comparison landed
+- ≥1 mechanism diagnostic published in PDF

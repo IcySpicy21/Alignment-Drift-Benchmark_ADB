@@ -1,46 +1,44 @@
-# Upload Decision Rubric (Now vs Delay 7-10 Days)
+# Upload now vs wait ~1 week
 
-Use this rubric to decide whether to upload immediately or delay for a stronger version.
+Decision aid only; numbers live in the manuscript, not here.
 
-## Recommendation in one line
+## One-line rule
 
-- Upload now if your goal is timestamp + feedback on exploratory evidence.
-- Delay 7-10 days if your goal is stronger lab/reviewer impact.
+- **Ship now** if you need a timestamped artifact and accept exploratory limits.
+- **Pause** if you are optimizing for a skeptical ML reviewer in one shot.
 
-## Gate A: Upload now (exploratory preprint)
+## Gate A — acceptable v1 drop
 
-Upload now if all are true:
+All must be true:
 
-- claims remain explicitly exploratory in title/abstract/body
-- corrected non-significance is clearly disclosed
-- proxy-vs-judge caveat is explicit wherever judge metrics appear
-- reproducibility pipeline runs from evaluator to analysis to paper build
+- Framing stays non-confirmatory in title/abstract/body.
+- Multiplicity-adjusted statistic for the Mistral headline is visible next to the raw value.
+- Judge section states automation limits (proxy/human status quo).
+- `evaluate_alignment_drift.py` → `run_analysis.py` → LaTeX tables chain reproduces on a fresh clone.
 
-Current status: met.
+*Internal note:* last audit tagged this gate green.
 
-## Gate B: Delay for stronger impact
+## Gate B — wait for stronger package
 
-Delay if you want high-signal reviewer impression and at least 3 of these are currently unmet:
+Worth delaying if **≥3** of these are still open:
 
-- 5-seed coverage for core model x precision cells
-- human-vs-judge (not proxy) with adjudicated annotations
-- multi-family expansion beyond current 3-model set
-- quantization method robustness with matched seeds (>=2 methods)
-- one mechanism-level diagnostic beyond aggregate rates
+- ≥5 RNG seeds on core `(model, precision)` cells with summarized variance.
+- Human adjudication (not regex proxy) feeding `judge_validation_paragraph.tex`.
+- >3 model families in the same matrix.
+- ≥2 INT4 backends with matched prompts/seeds in the same table.
+- Mechanism figure beyond coarse refusal rates.
 
-Current status: mostly unmet (partial progress only).
+*Internal note:* most items were partial last time this file was touched.
 
-## 7-10 day target definition
+## “v2 ready” working definition (lab use)
 
-A stronger v2 is reached when all of the following hold:
+- Seed aggregates + intervals checked in for the cells you cite.
+- Judge paragraph sourced from human merges.
+- Method table shows matched backend deltas.
+- New diagnostic figure referenced in Methods/Results.
+- Abstract mentions one cross-seed-stable sentence **only if** the CSVs back it.
 
-- seed aggregates populated for core cells with CI
-- human-vs-judge paragraph uses label-source=human
-- method robustness table includes matched comparisons with deltas
-- mechanism section includes one new diagnostic figure
-- final abstract includes one stable cross-seed finding statement
+## Strategy
 
-## Practical strategy
-
-- If submission urgency exists: upload now as v1 and continue v2 in parallel.
-- If no urgency: execute v2 sprint first, then upload once Gate B is largely satisfied.
+- Deadline-driven: tag v1, branch `v2-strength`.
+- Otherwise: close Gate B items, then tag once.

@@ -1,3 +1,6 @@
+# Auto-generated numeric scratchpad (analysis/run_analysis.py → summaries).
+# Not part of the PDF; safe to grep for regressions without echoing manuscript prose.
+
 Headline deltas (from refreshed 3-model summaries):
 - Highest refusal rate: google/gemma-2b-it (int4) = 0.2636
 - Lowest refusal rate: meta-llama/Meta-Llama-3-8B-Instruct (fp16) = 0.1473

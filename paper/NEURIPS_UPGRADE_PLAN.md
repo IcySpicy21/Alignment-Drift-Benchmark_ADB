@@ -1,12 +1,10 @@
-# NeurIPS-Oriented Upgrade Plan (V2)
+# Venue-strength backlog (internal)
 
-This plan converts the current exploratory paper into a confirmatory package.
+Checklist for tightening evidence; **do not** treat this markdown as citable text.
 
-## Priority 1: Multi-seed robustness
+## P1 — RNG / variance
 
-Goal: run 3-5 seeds for each model x precision cell and report mean/std/CI.
-
-Execution:
+Run 3–5 seeds per `(model, precision)` and archive aggregates.
 
 ```bash
 python evaluation/evaluate_alignment_drift.py \
@@ -17,28 +15,15 @@ python evaluation/evaluate_alignment_drift.py \
 python analysis/run_analysis.py
 ```
 
-Deliverables:
-- seed aggregates in analysis/seed_aggregate_*.csv
-- updated figures and summaries
+Deliverables: `analysis/seed_aggregate_*.csv` (or successor filenames your branch emits), refreshed plots.
 
-## Priority 2: Expand model coverage
+## P2 — More families
 
-Goal: reduce model-family artifact risk.
+Add instruction-tuned checkpoints outside the original trio (Qwen, Phi, MoE class, etc.) using the same harness.
 
-Recommended additions:
-- Qwen (instruction-tuned)
-- Phi (small model family)
-- Mixtral or another MoE model
-- Falcon-style baseline
+## P3 — Human adjudication
 
-Deliverables:
-- same precision/seed matrix and summary tables for added families
-
-## Priority 3: Human judge validation (real, not proxy)
-
-Goal: validate judge reliability with two independent annotators.
-
-Workflow:
+Two annotators, merge script, confusion exports; regenerate `paper/judge_validation_paragraph.tex` from **human** merges only.
 
 ```bash
 python analysis/prepare_human_annotation_packet.py \
@@ -53,20 +38,9 @@ python analysis/run_judge_validation_refresh.py \
   --label-source human
 ```
 
-Deliverables:
-- agreement summary and confusion matrix
-- human-vs-judge paragraph in paper/judge_validation_paragraph.tex
+## P4 — Quantizer sensitivity
 
-## Priority 4: Quantization method robustness
-
-Goal: show result is not specific to one quantizer.
-
-Methods to add:
-- AWQ
-- GPTQ
-- SmoothQuant (if architecture supports)
-
-Evaluator support is now available via:
+Match prompts/seeds across ≥2 INT4 stacks:
 
 ```bash
 python evaluation/evaluate_alignment_drift.py \
@@ -84,30 +58,21 @@ python evaluation/evaluate_alignment_drift.py \
   --temperature 0.7
 ```
 
-Deliverables:
-- method-wise drift table with matched prompts/seeds
+## P5 — Utility vs refusal chart
 
-## Priority 5: Safety-utility tradeoff figure
-
-Goal: show refusal changes relative to utility change in one interpretable figure.
-
-Implemented tooling:
+Regenerate when capability CSV changes:
 
 ```bash
 python analysis/plot_safety_utility_tradeoff.py
 ```
 
-Inputs:
-- analysis/refusal_summary.csv
-- analysis/capability_control.csv
+Inputs: `analysis/refusal_summary.csv`, `analysis/capability_control.csv`  
+Output: `figures/safety_utility_tradeoff.pdf`
 
-Output:
-- figures/safety_utility_tradeoff.pdf
+## Pre-submit sanity (venue mode)
 
-## Acceptance-focused checks before V2 submission
-
-- At least one key effect remains significant after correction across seeds
-- Human-vs-judge metrics reported with confusion matrix and disagreement slices
-- Multi-family consistency demonstrated (not only one model)
-- Quantization method sensitivity reported
-- Safety-utility tradeoff discussed with practical thresholds
+- Cross-seed stability referenced **only** if CSV proves it.  
+- Human-judge metrics + disagreement slices present.  
+- Multi-family table present (not one row).  
+- Quantizer section present.  
+- Utility/refusal figure discussed with operational interpretation.
