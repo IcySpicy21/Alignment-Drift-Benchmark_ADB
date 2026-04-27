@@ -143,3 +143,9 @@ Dry run (cap prompts): `MAX_PROMPTS=5 bash scripts/run_v2_matrix.sh` · Mistral-
 - **Drift rows** only exist for quantized precisions; FP16 is the implicit baseline (`fp16` drift = `not_applicable` in coverage tables).
 - **Submission / release checklist:** `paper/STAGE8_SUBMISSION_VISIBILITY.md`
 - **Maintainer path:** this README tracks [`IcySpicy21/Alignment-Drift-Benchmark_ADB`](https://github.com/IcySpicy21/Alignment-Drift-Benchmark_ADB); cite the artifact entry in `paper/references.bib` when pointing readers to code from the PDF.
+
+---
+
+## License
+
+**All rights reserved.** See [`LICENSE`](LICENSE).
