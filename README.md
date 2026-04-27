@@ -124,9 +124,36 @@ Dry run (cap prompts): `MAX_PROMPTS=5 bash scripts/run_v2_matrix.sh` · Mistral-
 | Completeness audit | `analysis/refusal_coverage.csv`, `drift_coverage.csv`, `margin_coverage.csv` |
 | Plots | `figures/` (e.g. heatmap, violin, safety–utility overlay—see `paper/paper.tex`) |
 | Frozen numeric scratchpad | `paper/results_headline_summary.txt` |
-| Manuscript | `paper/paper.tex` · arXiv bundle: `bash scripts/package_arxiv.sh` → `paper/arxiv_submission/arxiv_source.tar.gz` |
+| Manuscript (LaTeX) | `paper/paper.tex` · arXiv bundle: `bash scripts/package_arxiv.sh` → `paper/arxiv_submission/arxiv_source.tar.gz` |
+| Manuscript (PDF) | `paper/paper.pdf` — build locally with LaTeX (see [Building the PDF](#building-the-pdf)) |
 
 **Headline snapshot** (v1 three-model refresh; exploratory—see paper for FDR and limits): Mistral-7B shows the largest **INT8→INT4 refusal step** among the trio; Gemma tops **absolute** refusal rate in that snapshot. Full decimals live in `paper/results_headline_summary.txt`.
+
+---
+
+## Building the PDF
+
+You need **`pdflatex`** and **`bibtex`** (e.g. [TeX Live](https://www.tug.org/texlive/) or macOS **BasicTeX**). From the repo root:
+
+```bash
+cd paper
+pdflatex paper.tex
+bibtex paper
+pdflatex paper.tex
+pdflatex paper.tex
+```
+
+That writes **`paper/paper.pdf`** next to `paper.tex`.
+
+**macOS:** If the shell reports `command not found: pdflatex`, TeX is often installed under `/Library/TeX/texbin` but not on your `PATH` (common with **conda** `(base)`). Either run once per session:
+
+```bash
+export PATH="/Library/TeX/texbin:$PATH"
+```
+
+or add that line to `~/.zshrc` so `pdflatex` and `bibtex` resolve everywhere.
+
+Harmless **overfull/underfull hbox** messages about long Hugging Face model IDs in monospace are normal unless you tighten line breaks in the `.tex` source.
 
 ---
 

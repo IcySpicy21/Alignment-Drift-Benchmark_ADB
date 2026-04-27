@@ -1,32 +1,20 @@
 \relax 
 \providecommand\hyper@newdestlabel[2]{}
-\providecommand\HyperFirstAtBeginDocument{\AtBeginDocument}
-\HyperFirstAtBeginDocument{\ifx\hyper@anchor\@undefined
-\global\let\oldcontentsline\contentsline
-\gdef\contentsline#1#2#3#4{\oldcontentsline{#1}{#2}{#3}}
-\global\let\oldnewlabel\newlabel
-\gdef\newlabel#1#2{\newlabelxx{#1}#2}
-\gdef\newlabelxx#1#2#3#4#5#6{\oldnewlabel{#1}{{#2}{#3}}}
-\AtEndDocument{\ifx\hyper@anchor\@undefined
-\let\contentsline\oldcontentsline
-\let\newlabel\oldnewlabel
-\fi}
-\fi}
-\global\let\hyper@last\relax 
-\gdef\HyperFirstAtBeginDocument#1{#1}
 \providecommand\HyField@AuxAddToFields[1]{}
 \providecommand\HyField@AuxAddToCoFields[2]{}
+\citation{mazeika2024harmbench}
+\citation{gupta2026adb_artifacts}
 \citation{dettmers2022llmint8}
 \citation{frantar2022gptq}
 \citation{dettmers2023qlora}
-\@writefile{toc}{\contentsline {section}{\numberline {1}Introduction}{1}{section.1}\protected@file@percent }
 \citation{bai2022constitutional,touvron2023llama2}
 \citation{mazeika2024harmbench}
 \citation{yang2023shadow}
 \citation{wei2023jailbroken}
+\@writefile{toc}{\contentsline {section}{\numberline {1}Introduction}{1}{section.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {2}Related Work}{1}{section.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Post-Training Quantization.}{1}{section*.3}\protected@file@percent }
 \citation{mazeika2024harmbench}
-\@writefile{toc}{\contentsline {section}{\numberline {2}Related Work}{2}{section.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Post-Training Quantization.}{2}{section*.3}\protected@file@percent }
 \@writefile{toc}{\contentsline {paragraph}{LLM Alignment and Safety.}{2}{section*.4}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {3}Methodology}{2}{section.5}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.1}Dataset Generation and External Validity}{2}{subsection.6}\protected@file@percent }
@@ -35,55 +23,58 @@
 \@writefile{toc}{\contentsline {paragraph}{Judge Validation Snapshot.}{2}{section*.9}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {4}Results and Analysis}{3}{section.10}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Drift Significance vs Capability Control}{3}{subsection.11}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces LLM-Judge Refusal Rate ($R$) with p-values assessing drift significance relative to each model's FP16 baseline.}}{3}{table.13}\protected@file@percent }
-\newlabel{tab:refusal}{{1}{3}{LLM-Judge Refusal Rate ($R$) with p-values assessing drift significance relative to each model's FP16 baseline}{table.13}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Refusal rate heatmap across models and precisions (viridis colormap, colorblind-safe). Cells are annotated with exact refusal proportions.}}{4}{figure.15}\protected@file@percent }
-\newlabel{fig:heatmap}{{1}{4}{Refusal rate heatmap across models and precisions (viridis colormap, colorblind-safe). Cells are annotated with exact refusal proportions}{figure.15}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Violin distributions of log-probability refusal margins by precision level. Mistral-7B-Instruct-v0.2 shows the largest distributional shift at INT4, with visibly wider spread.}}{4}{figure.17}\protected@file@percent }
-\newlabel{fig:violin}{{2}{4}{Violin distributions of log-probability refusal margins by precision level. Mistral-7B-Instruct-v0.2 shows the largest distributional shift at INT4, with visibly wider spread}{figure.17}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Judge-estimated refusal prevalence $R$ by checkpoint; third column lists two-proportion tests against the matching FP16 run.}}{3}{table.13}\protected@file@percent }
+\newlabel{tab:refusal}{{1}{3}{Judge-estimated refusal prevalence $R$ by checkpoint; third column lists two-proportion tests against the matching FP16 run}{table.13}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Heatmap of Table~\ref {tab:refusal} proportions; perceptually uniform \texttt  {viridis} scale with numeric annotations.}}{3}{figure.15}\protected@file@percent }
+\newlabel{fig:heatmap}{{1}{3}{Heatmap of Table~\ref {tab:refusal} proportions; perceptually uniform \texttt {viridis} scale with numeric annotations}{figure.15}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces First-token logit gap between dominant refusal and compliance continuations; Mistral's INT4 band stretches the farthest.}}{4}{figure.17}\protected@file@percent }
+\newlabel{fig:violin}{{2}{4}{First-token logit gap between dominant refusal and compliance continuations; Mistral's INT4 band stretches the farthest}{figure.17}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Mistral slice: closed-book MMLU, GSM8K, and judge refusal rate at each precision.}}{4}{table.19}\protected@file@percent }
+\newlabel{tab:mmlu}{{2}{4}{Mistral slice: closed-book MMLU, GSM8K, and judge refusal rate at each precision}{table.19}{}}
 \citation{wei2023jailbroken}
 \citation{wei2023jailbroken}
-\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Capability controls (MMLU/GSM8K) partially separating intelligence loss from safety drift.}}{5}{table.19}\protected@file@percent }
-\newlabel{tab:mmlu}{{2}{5}{Capability controls (MMLU/GSM8K) partially separating intelligence loss from safety drift}{table.19}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Safety-utility tradeoff view for the Mistral capability-control slice (FP16/INT8/INT4). Utility is summarized as the mean of MMLU and GSM8K, while safety is represented by refusal rate. The trend illustrates increasing refusal as utility decreases under stronger quantization.}}{5}{figure.21}\protected@file@percent }
-\newlabel{fig:safety_utility_tradeoff}{{3}{5}{Safety-utility tradeoff view for the Mistral capability-control slice (FP16/INT8/INT4). Utility is summarized as the mean of MMLU and GSM8K, while safety is represented by refusal rate. The trend illustrates increasing refusal as utility decreases under stronger quantization}{figure.21}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}Categorical Ablation: Harmful vs. Jailbreak}{6}{subsection.22}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces Refusal Rates $R \pm SE$ disaggregated by prompt category. Mistral-7B-Instruct-v0.2 complied with all 200 synthetic jailbreak prompts at FP16, consistent with known susceptibility to DAN-style overrides \cite  {wei2023jailbroken}.}}{6}{table.24}\protected@file@percent }
-\newlabel{tab:category}{{3}{6}{Refusal Rates $R \pm SE$ disaggregated by prompt category. Mistral-7B-Instruct-v0.2 complied with all 200 synthetic jailbreak prompts at FP16, consistent with known susceptibility to DAN-style overrides \cite {wei2023jailbroken}}{table.24}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.3}Qualitative Drift Examples}{6}{subsection.25}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces A qualitative translation example from Mistral-7B illustrating an INT4-induced refusal flip.}}{6}{table.27}\protected@file@percent }
-\newlabel{tab:qualitative}{{4}{6}{A qualitative translation example from Mistral-7B illustrating an INT4-induced refusal flip}{table.27}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Bivariate summary for Mistral: $y$-axis is judge refusal rate; $x$-axis averages MMLU and GSM8K (\%).}}{5}{figure.21}\protected@file@percent }
+\newlabel{fig:safety_utility_tradeoff}{{3}{5}{Bivariate summary for Mistral: $y$-axis is judge refusal rate; $x$-axis averages MMLU and GSM8K (\%)}{figure.21}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}Categorical Ablation: Harmful vs. Jailbreak}{5}{subsection.22}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces Category-stratified $R\pm SE$ on Mistral; FP16 jailbreak column hits zero refusals across the $200$ synthetic jailbreak draws, aligning with documented jailbreak fragility \cite  {wei2023jailbroken}.}}{5}{table.24}\protected@file@percent }
+\newlabel{tab:category}{{3}{5}{Category-stratified $R\pm SE$ on Mistral; FP16 jailbreak column hits zero refusals across the $200$ synthetic jailbreak draws, aligning with documented jailbreak fragility \cite {wei2023jailbroken}}{table.24}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.3}Qualitative Drift Examples}{5}{subsection.25}\protected@file@percent }
+\citation{gupta2026adb_artifacts}
+\@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces Semantic paraphrase of one Mistral-7B-Instruct-v0.2 pair: identical prompt string, divergent precision, opposite judge polarity. Raw generations are omitted to avoid redundant publication of unsafe text.}}{6}{table.27}\protected@file@percent }
+\newlabel{tab:qualitative}{{4}{6}{Semantic paraphrase of one Mistral-7B-Instruct-v0.2 pair: identical prompt string, divergent precision, opposite judge polarity. Raw generations are omitted to avoid redundant publication of unsafe text}{table.27}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {4.4}Failure Mode Analysis}{6}{subsection.28}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {5}Discussion}{6}{section.29}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {6}Reproducibility Details}{7}{section.30}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {7}Ethical Statement}{7}{section.31}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.1}Limitations}{7}{subsection.32}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.2}Planned Replication Experiments}{7}{subsection.33}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {6}Reproducibility Details}{6}{section.30}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {7}Ethical Statement}{6}{section.31}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.1}Limitations}{6}{subsection.32}\protected@file@percent }
 \bibstyle{plain}
 \bibdata{references}
 \bibcite{bai2022constitutional}{1}
 \bibcite{dettmers2022llmint8}{2}
 \bibcite{dettmers2023qlora}{3}
 \bibcite{frantar2022gptq}{4}
-\bibcite{mazeika2024harmbench}{5}
-\bibcite{touvron2023llama2}{6}
-\bibcite{wei2023jailbroken}{7}
-\bibcite{yang2023shadow}{8}
-\@writefile{toc}{\contentsline {section}{\numberline {8}Conclusion and Future Work}{8}{section.34}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {A}Preliminary Layer-Wise Ablation}{9}{appendix.36}\protected@file@percent }
-\newlabel{app:layerwise}{{A}{9}{Preliminary Layer-Wise Ablation}{appendix.36}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {5}{\ignorespaces Layer-wise quantization ablation on Mistral-7B. MLP layers account for $\sim $81\% of the total alignment drift, suggesting that the feed-forward projections are the primary locus of safety-critical weight interactions disrupted by 4-bit precision noise.}}{9}{table.38}\protected@file@percent }
-\newlabel{tab:layerwise}{{5}{9}{Layer-wise quantization ablation on Mistral-7B. MLP layers account for $\sim $81\% of the total alignment drift, suggesting that the feed-forward projections are the primary locus of safety-critical weight interactions disrupted by 4-bit precision noise}{table.38}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {B}Preliminary INT4 Backend Comparison (Inconclusive)}{9}{appendix.39}\protected@file@percent }
-\newlabel{app:backend_robustness}{{B}{9}{Preliminary INT4 Backend Comparison (Inconclusive)}{appendix.39}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {6}{\ignorespaces Preliminary INT4 backend comparison on matched, prompt-limited slices. Given low sample sizes and high variance across seeds, these values are diagnostic only and not sufficient for backend-level conclusions.}}{9}{table.41}\protected@file@percent }
-\newlabel{tab:backend_robustness}{{6}{9}{Preliminary INT4 backend comparison on matched, prompt-limited slices. Given low sample sizes and high variance across seeds, these values are diagnostic only and not sufficient for backend-level conclusions}{table.41}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces INT4 refusal-rate comparison across quantization backends from available pilot runs. This plot is exploratory and should not be interpreted as a stable backend ranking.}}{10}{figure.43}\protected@file@percent }
-\newlabel{fig:backend_robustness_plot}{{4}{10}{INT4 refusal-rate comparison across quantization backends from available pilot runs. This plot is exploratory and should not be interpreted as a stable backend ranking}{figure.43}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {C}Judge Validation Reporting Template}{10}{appendix.44}\protected@file@percent }
-\newlabel{app:judge_template}{{C}{10}{Judge Validation Reporting Template}{appendix.44}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {7}{\ignorespaces Standard reporting template for human-vs-judge validation in replication runs.}}{10}{table.46}\protected@file@percent }
-\newlabel{tab:judge_template}{{7}{10}{Standard reporting template for human-vs-judge validation in replication runs}{table.46}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {D}Reproducibility and Quality Assurance Checklist}{10}{appendix.47}\protected@file@percent }
-\newlabel{app:reviewer_checklist}{{D}{10}{Reproducibility and Quality Assurance Checklist}{appendix.47}{}}
-\gdef \@abspage@last{11}
+\bibcite{gupta2026adb_artifacts}{5}
+\bibcite{mazeika2024harmbench}{6}
+\bibcite{touvron2023llama2}{7}
+\bibcite{wei2023jailbroken}{8}
+\bibcite{yang2023shadow}{9}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.2}Planned Replication Experiments}{7}{subsection.33}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {8}Conclusion and Future Work}{7}{section.34}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Informal rollout hint.}{7}{section*.35}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {A}Preliminary Layer-Wise Ablation}{8}{appendix.37}\protected@file@percent }
+\newlabel{app:layerwise}{{A}{8}{Preliminary Layer-Wise Ablation}{appendix.37}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {5}{\ignorespaces Selective INT4 on Mistral-7B-Instruct-v0.2: FFN-only quantization reproduces $\sim $81\% of the full-model refusal delta observed in Table~\ref {tab:refusal}.}}{8}{table.39}\protected@file@percent }
+\newlabel{tab:layerwise}{{5}{8}{Selective INT4 on Mistral-7B-Instruct-v0.2: FFN-only quantization reproduces $\sim $81\% of the full-model refusal delta observed in Table~\ref {tab:refusal}}{table.39}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {B}Preliminary INT4 Backend Comparison (Inconclusive)}{8}{appendix.40}\protected@file@percent }
+\newlabel{app:backend_robustness}{{B}{8}{Preliminary INT4 Backend Comparison (Inconclusive)}{appendix.40}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {6}{\ignorespaces Pilot NF4 backends (matched Mistral slices, tiny $n$); interpret as variance diagnostics, not rankings.}}{8}{table.42}\protected@file@percent }
+\newlabel{tab:backend_robustness}{{6}{8}{Pilot NF4 backends (matched Mistral slices, tiny $n$); interpret as variance diagnostics, not rankings}{table.42}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Backend pilot corresponding to Table~\ref {tab:backend_robustness}; unstable sampling yields wide swings.}}{9}{figure.44}\protected@file@percent }
+\newlabel{fig:backend_robustness_plot}{{4}{9}{Backend pilot corresponding to Table~\ref {tab:backend_robustness}; unstable sampling yields wide swings}{figure.44}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {C}Judge Validation Reporting Template}{9}{appendix.45}\protected@file@percent }
+\newlabel{app:judge_template}{{C}{9}{Judge Validation Reporting Template}{appendix.45}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {7}{\ignorespaces Planned CSV schema once dual-human labels exist.}}{9}{table.47}\protected@file@percent }
+\newlabel{tab:judge_template}{{7}{9}{Planned CSV schema once dual-human labels exist}{table.47}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {D}Reproducibility and Quality Assurance Checklist}{9}{appendix.48}\protected@file@percent }
+\newlabel{app:reviewer_checklist}{{D}{9}{Reproducibility and Quality Assurance Checklist}{appendix.48}{}}
+\gdef \@abspage@last{10}
