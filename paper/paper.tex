@@ -23,7 +23,7 @@
 \begin{abstract}
 INT4 PTQ is pitched as a cheap win for latency; we cared whether it also shuffles \emph{refusal} telemetry on instruction-tuned chats, not just perplexity leaderboards. Three public checkpoints---\texttt{google/gemma-2b-it}, \texttt{mistralai/Mistral-7B-Instruct-v0.2}, \texttt{meta-llama/Meta-Llama-3-8B-Instruct}---see $550$ in-house template probes plus $200$ HarmBench pulls \cite{mazeika2024harmbench} ($750$ prompts total). A frozen \texttt{Llama-3-70B} judge stamps each completion as refuse or comply; MMLU and GSM8K on the same weight snapshots flag gross capability loss without conflating it with refusal swings.
 
-Only Mistral moves enough to talk about before multiplicity: nominal two-proportion $p{=}0.027$, $OR{=}1.46$. After Benjamini--Hochberg across six prespecified FP16-vs-quantized contrasts that headline softens to $p{=}0.16$. Gemma and Llama traces stay boring on the hours we could afford. Scripts, frozen prompts, plots, toy dashboard: \cite{gupta2026adb_artifacts}.
+Only Mistral moves enough to talk about before multiplicity: nominal two-proportion $p{=}0.027$, $OR{=}1.44$. After Benjamini--Hochberg across six prespecified FP16-vs-quantized contrasts that headline softens to $p{=}0.16$. Gemma and Llama traces stay boring on the hours we could afford. Scripts, frozen prompts, plots, toy dashboard: \cite{gupta2026adb_artifacts}.
 \end{abstract}
 
 \noindent\textbf{Keywords:} LLM safety, quantization, alignment drift, refusal behavior, robustness
@@ -77,15 +77,15 @@ Table~\ref{tab:refusal} is the judge dump: refusal frequencies, SEs, two-proport
 Model & Precision & Refusal Rate ($R$) & Drift ($p$-value) \\
 google/gemma-2b-it & fp16 & 0.238 $\pm$ 0.018 & - \\
 \midrule
-google/gemma-2b-it & int8 & 0.258 $\pm$ 0.019 & $p=0.365$ \\
-google/gemma-2b-it & int4 (NF4) & 0.264 $\pm$ 0.019 & $p=0.171$ \\
+google/gemma-2b-it & int8 & 0.258 $\pm$ 0.019 & $p=0.485$ \\
+google/gemma-2b-it & int4 (NF4) & 0.264 $\pm$ 0.019 & $p=0.366$ \\
 mistralai/Mistral-7B-Instruct-v0.2 & fp16 & 0.151 $\pm$ 0.015 & - \\
 \midrule
-mistralai/Mistral-7B-Instruct-v0.2 & int8 & 0.167 $\pm$ 0.016 & $p=0.108$ \\
+mistralai/Mistral-7B-Instruct-v0.2 & int8 & 0.167 $\pm$ 0.016 & $p=0.510$ \\
 mistralai/Mistral-7B-Instruct-v0.2 & int4 (NF4) & 0.204 $\pm$ 0.017 & $p=0.027^*$ \\
 meta-llama/Meta-Llama-3-8B-Instruct & fp16 & 0.147 $\pm$ 0.015 & - \\
 \midrule
-meta-llama/Meta-Llama-3-8B-Instruct & int8 & 0.153 $\pm$ 0.015 & $p=0.773$ \\
+meta-llama/Meta-Llama-3-8B-Instruct & int8 & 0.153 $\pm$ 0.015 & $p=0.866$ \\
 meta-llama/Meta-Llama-3-8B-Instruct & int4 (NF4) & 0.162 $\pm$ 0.016 & $p=0.559$ \\
 \bottomrule
 \end{tabular}
@@ -107,9 +107,9 @@ meta-llama/Meta-Llama-3-8B-Instruct & int4 (NF4) & 0.162 $\pm$ 0.016 & $p=0.559$
 \label{fig:violin}
 \end{figure}
 
-BH across six FP16-vs-quantized contrasts leaves Mistral INT4 vs FP16 at adjusted $p=0.16$---so no asterisk heroics. The raw $OR=1.46$ still tells you direction and magnitude before the multiplicity mop.
+BH across six FP16-vs-quantized contrasts leaves Mistral INT4 vs FP16 at adjusted $p=0.16$---so no asterisk heroics. The raw $OR=1.44$ still tells you direction and magnitude before the multiplicity mop.
 
-INT8 hugs FP16 on all three rows ($p=0.365$, $0.108$, $0.773$); boring in a good way.
+INT8 hugs FP16 on all three rows ($p=0.485$, $0.510$, $0.866$); boring in a good way.
 
 The interesting split is qualitative, not NHST theater: is Mistral refusing more because logits lean ``sorry can't help,'' or because the model actually slid on skills? Table~\ref{tab:mmlu} chases that second story.
 
