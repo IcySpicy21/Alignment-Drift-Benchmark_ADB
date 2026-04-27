@@ -1,0 +1,8 @@
+# arXiv Submission System 1.5 — https://info.arxiv.org/help/00README.html
+spec_version: 1
+process:
+  compiler: pdflatex
+sources:
+  - filename: paper.tex
+    usage: toplevel
+texlive_version: 2025

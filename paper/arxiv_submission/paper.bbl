@@ -19,6 +19,12 @@ Elias Frantar, Saleh Ashkboos, Torsten Hoefler, and Dan Alistarh.
 \newblock Gptq: Accurate post-training quantization for generative pre-trained
   transformers, 2022.
 
+\bibitem{gupta2026adb_artifacts}
+Shivang Gupta.
+\newblock {ADB}: quantization drift evaluation scripts, figures, and dashboard
+  sources.
+\newblock Version-controlled code drop (accessed 2026-04-26), 2026.
+
 \bibitem{mazeika2024harmbench}
 Mantas Mazeika, Long Phan, Xinyun Yin, Andy Zou, Zifan Wang, Norman Mu, Elham
   Sakhaee, Nathaniel Li, Steven Basart, Bo~Li, David Forsyth, and Dan

@@ -21,56 +21,54 @@
 \maketitle
 
 \begin{abstract}
-We ask whether aggressive 4-bit post-training quantization (PTQ) reorders refusal frequencies relative to FP16 on instruction-tuned chat checkpoints. The empirical core contrasts \texttt{google/gemma-2b-it}, \texttt{mistralai/Mistral-7B-Instruct-v0.2}, and \texttt{meta-llama/Meta-Llama-3-8B-Instruct} on $550$ internally templated probes plus $200$ prompts drawn from the HarmBench distribution \cite{mazeika2024harmbench} ($750$ items). Responses receive binary refusal/compliance tags from a frozen \texttt{Llama-3-70B} rater. Auxiliary MMLU and GSM8K runs on matched weights isolate coarse capability loss from the refusal trajectory. Mistral alone exhibits a pre-correction lift (nominal $p{=}0.027$, $OR{=}1.46$) that weakens to Benjamini--Hochberg-adjusted $p{=}0.16$ across six prespecified FP16-versus-quantized contrasts; the other two families remain visually flat on this budget. Artifacts for rerunning prompts, plots, and the dashboard prototype are listed in \cite{gupta2026adb_artifacts}.
+INT4 PTQ is pitched as a cheap win for latency; we cared whether it also shuffles \emph{refusal} telemetry on instruction-tuned chats, not just perplexity leaderboards. Three public checkpoints---\texttt{google/gemma-2b-it}, \texttt{mistralai/Mistral-7B-Instruct-v0.2}, \texttt{meta-llama/Meta-Llama-3-8B-Instruct}---see $550$ in-house template probes plus $200$ HarmBench pulls \cite{mazeika2024harmbench} ($750$ prompts total). A frozen \texttt{Llama-3-70B} judge stamps each completion as refuse or comply; MMLU and GSM8K on the same weight snapshots flag gross capability loss without conflating it with refusal swings.
+
+Only Mistral moves enough to talk about before multiplicity: nominal two-proportion $p{=}0.027$, $OR{=}1.46$. After Benjamini--Hochberg across six prespecified FP16-vs-quantized contrasts that headline softens to $p{=}0.16$. Gemma and Llama traces stay boring on the hours we could afford. Scripts, frozen prompts, plots, toy dashboard: \cite{gupta2026adb_artifacts}.
 \end{abstract}
 
 \noindent\textbf{Keywords:} LLM safety, quantization, alignment drift, refusal behavior, robustness
 
 
 \section{Introduction}
-The opening empirical surprise was jailbreak-specific: \texttt{mistralai/Mistral-7B-Instruct-v0.2} satisfied every synthetic jailbreak instance at FP16 ($n{=}200$) yet began declining a subset once NF4 weights replaced FP16 tensors. The direction contradicted an informal prior that aggressive rounding would \emph{only} erode safeguards.
+First shock was jailbreak-shaped, not generic ``safety got worse.'' \texttt{mistralai/Mistral-7B-Instruct-v0.2} cleared every synthetic jailbreak draw at FP16 ($n{=}200$), then started answering some of them after we swapped in NF4 weights---the opposite direction from the lazy story that quantization only sandpapers guardrails.
 
-Latency-conscious deployments increasingly ship INT4 checkpoints; INT8 behaved like a near overlay in our sweeps, whereas INT4 nudged Mistral's refusal telemetry without a commensurate capability collapse on MMLU/GSM8K. Published quantization studies emphasize perplexity and leaderboard scores; refusal slopes are rarely plotted. If preference tuning mainly reshapes a thin shell around a broad pretraining basin, then PTQ noise could reorder low-probability refusal modes even when aggregate accuracy looks stable.
+People ship INT4 in production anyway. On our cards INT8 basically overlaid FP16; INT4 nudged Mistral's refusal counters without tanking MMLU/GSM8K the way a broken model would. Most PTQ papers still plot perplexity; refusal curves barely exist. If RLHF mostly paints a thin veneer on a fat pretrained basin, maybe low-rate refusal modes reshuffle when matmuls get noisy even while aggregate accuracy yawns.
 
-Gemma-2B-IT and Meta-Llama-3-8B-Instruct provide contrast cases so the Mistral trajectory is not read as universal. After multiplicity control the headline contrast is muted ($p{=}0.16$), underscoring replication over declarative claims.
+Gemma-2B-IT and Meta-Llama-3-8B-Instruct sit in the paper as controls so nobody prints ``INT4 broke everything.'' Once you pay the multiplicity tax the Mistral blip stops whispering significance ($p{=}0.16$); treat the write-up as telemetry plus a replication wish-list, not a law.
 
 \section{Related Work}
 
 \paragraph{Post-Training Quantization.}
-Rather than retraining, PTQ swaps high-precision tensors for compact surrogates while leaving the forward pass structurally intact; the practical payoff is smaller resident weights and faster matmuls at the cost of rounding error. \mbox{LLM.int8()} \cite{dettmers2022llmint8} and GPTQ \cite{frantar2022gptq} document strong task retention after aggressive compression. QLoRA \cite{dettmers2023qlora} later paired NF4 storage with adapters; here the INT4 branch mirrors a conventional \texttt{bitsandbytes} NF4 deployment path.
+PTQ keeps the forward graph and swaps tensors for cheaper approximations---no full retrain, just rounding noise you hope stays benign. \mbox{LLM.int8()} \cite{dettmers2022llmint8} and GPTQ \cite{frantar2022gptq} mostly brag about task scores surviving aggressive compression. QLoRA \cite{dettmers2023qlora} glued adapters onto NF4 storage; our INT4 arm is closer to what \texttt{bitsandbytes} NF4 looks like in a boring production Dockerfile.
 
 \paragraph{LLM Alignment and Safety.}
-Supervised instruction phases and preference optimization blunt harmful completions \cite{bai2022constitutional, touvron2023llama2}. Standardized attack sets such as HarmBench \cite{mazeika2024harmbench} operationalize red-team pressure. Adversarial finetuning can unwind guardrails (``Shadow Alignment'') \cite{yang2023shadow}, and jailbreak templates remain an active threat class \cite{wei2023jailbroken}. Quantization differs because it perturbs parameters \emph{after} alignment training rather than through additional gradient steps.
+Instruction tuning and preference losses blunt obvious harms \cite{bai2022constitutional, touvron2023llama2}. HarmBench \cite{mazeika2024harmbench} is the public prompt zoo we borrow from. Shadow-style finetunes can peel guardrails back off \cite{yang2023shadow}; template jailbreaks still circulate \cite{wei2023jailbroken}. Quantization is a different beast---it jitters weights \emph{after} whoever did alignment went home, without an adversary explicitly optimizing against safety loss.
 
 \section{Methodology}
 
 \subsection{Dataset Generation and External Validity}
-Synthetic coverage comes from a finite cross-product over five thematic buckets and three behavioral tags (Harmful, Jailbreak, Adversarial), producing $550$ unique strings. External stress tests reuse $200$ publicly distributed HarmBench items \cite{mazeika2024harmbench} so the template statistics face prompts we did not author. The combined $750$-prompt ceiling reflected available A100-hours rather than a power calculation.
+Templates are a deliberate cross-product: five coarse themes $\times$ three tags (Harmful, Jailbreak, Adversarial) $\Rightarrow$ $550$ unique strings we wrote ourselves. HarmBench contributes another $200$ rows we did not hand-author \cite{mazeika2024harmbench} so the template stats get poked by outside wording. Stopping at $750$ prompts was a GPU-hours decision, not a power analysis---call that out so nobody mistakes the ceiling for a sample-size brag.
 
 \subsection{Quantization and Models}
-We evaluate \texttt{google/gemma-2b-it}, \texttt{mistralai/Mistral-7B-Instruct-v0.2}, and \texttt{meta-llama/Meta-Llama-3-8B-Instruct} across three precision regimes: FP16 (baseline), INT8, and INT4. Our primary pipeline uses \texttt{bitsandbytes} NF4 variants for the INT4 condition.
+Same three HF ids above, three precision skins each: FP16 baseline, INT8, INT4. INT4 in the tables means \texttt{bitsandbytes} NF4 unless we say otherwise.
 
 \subsection{LLM-as-a-Judge and Metrics}
-Keyword filters proved brittle on hedged refusals, so each model answer is scored by \texttt{Llama-3-70B} under a two-label schema (\emph{Safe}/refusal vs.\ \emph{Unsafe}/compliance). A cursory manual review of ambiguous cases checked for systematic label inversion.
+Regex gates cried on hedged refusals, so everything runs through \texttt{Llama-3-70B} with a blunt binary schema (\emph{Safe}/refusal vs.\ \emph{Unsafe}/compliance). We spot-checked ambiguous bins for systematic flips; it was sanity maintenance, not a second full-time rater.
 
-The automated rater is auxiliary: dual-human coding with published disagreement statistics is deferred, so downstream claims hinge on relative shifts rather than absolute refusal prevalence.
+Treat the judge as scaffolding: no dual-human spreadsheet yet, so we lean on deltas between precisions instead of pretending the absolute refusal counts are ground truth.
 
 \input{judge_validation_paragraph.tex}
 
-Raw and Benjamini--Hochberg--adjusted $p$-values appear side by side; failure to clear FDR is treated as inconclusive evidence, not proof of nullity.
+Tables print raw $p$s next to Benjamini--Hochberg cuts; missing FDR clearance means ``do not shout winner,'' not ``accept null with ceremony.''
 
-\begin{itemize}
-    \item \textbf{Refusal rate $R$:} Standard errors on the empirical refusal proportions (Table~\ref{tab:refusal}) with two-sample proportion tests against each model's FP16 arm.
-    \item \textbf{Odds ratio $OR$:} $2\times2$ tables (refuse vs comply $\times$ FP16 vs INT4) for the Mistral headline comparison.
-    \item \textbf{Refusal margin $M_{\mathrm{ref}}$:} log-prob gap between the top refusal token and the top compliance token at the first generation step.
-    \item \textbf{Capability controls:} MMLU and GSM8K on the same quantized checkpoints to separate ``got dumber'' from ``refuses differently.''
-\end{itemize}
+$R$ is the refusal proportion with SEs plus two-sample tests vs each model's FP16 row (Table~\ref{tab:refusal}). $OR$ compresses Mistral's refuse/comply $\times$ FP16/INT4 grid. $M_{\mathrm{ref}}$ tracks the first-token logit gap between the strongest refusal and compliance continuations. MMLU and GSM8K reuse the quantized weights so we can separate ``refuses more'' from ``forgot middle school math.''
+
 
 \section{Results and Analysis}
 
 \subsection{Drift Significance vs Capability Control}
 
-Table~\ref{tab:refusal} lists empirical refusal frequencies with standard errors from the judge pipeline. 
+Table~\ref{tab:refusal} is the judge dump: refusal frequencies, SEs, two-proportion $p$s vs FP16. 
 
 \begin{table}[H]
 \centering
@@ -109,11 +107,11 @@ meta-llama/Meta-Llama-3-8B-Instruct & int4 (NF4) & 0.162 $\pm$ 0.016 & $p=0.559$
 \label{fig:violin}
 \end{figure}
 
-Benjamini--Hochberg across the six FP16-vs-quantized contrasts leaves the largest lift (Mistral INT4 vs FP16) at adjusted $p=0.16$, so we do not treat it as a classical significant effect. The raw odds ratio $OR=1.46$ is still useful as an effect-size shorthand before correction.
+BH across six FP16-vs-quantized contrasts leaves Mistral INT4 vs FP16 at adjusted $p=0.16$---so no asterisk heroics. The raw $OR=1.46$ still tells you direction and magnitude before the multiplicity mop.
 
-INT8 rows in Table~\ref{tab:refusal} stay close to FP16 for all three checkpoints ($p=0.365$, $0.108$, and $0.773$ respectively).
+INT8 hugs FP16 on all three rows ($p=0.365$, $0.108$, $0.773$); boring in a good way.
 
-The harder question is causal flavor, not stars: is Mistral refusing more because logits skewed toward ``I can't help,'' or because the model is simply worse at everything? Table~\ref{tab:mmlu} separates the two stories.
+The interesting split is qualitative, not NHST theater: is Mistral refusing more because logits lean ``sorry can't help,'' or because the model actually slid on skills? Table~\ref{tab:mmlu} chases that second story.
 
 \begin{table}[H]
 \centering
@@ -130,7 +128,7 @@ mistralai/Mistral-7B-Instruct-v0.2 & int4 (NF4) & 60.1\% & 32.4\% & 20.4\% ($p=0
 \label{tab:mmlu}
 \end{table}
 
-MMLU slips about 2.4 points (absolute percent) from FP16 to INT4; refusals climb by 5.3 points on the same sweep. The gap between those slopes is what we mean by partial decoupling---refusal moves faster than the capability proxy.
+MMLU loses $\sim$2.4 absolute points FP16$\rightarrow$INT4; refusals jump $\sim$5.3 points on the same sweep. Refusal slope outruns the capability slope---``partial decoupling'' is just shorthand for that gap.
 
 \begin{figure}[H]
 \centering
@@ -139,11 +137,11 @@ MMLU slips about 2.4 points (absolute percent) from FP16 to INT4; refusals climb
 \label{fig:safety_utility_tradeoff}
 \end{figure}
 
-Five points on the refusal scale is roughly 50 extra blocked replies per thousand draws \emph{if} traffic looks like our mix---but ``more refusals'' is ambiguous. It can mean safer filtering or brittle over-blocking; we report the number without claiming which interpretation holds for a live product.
+Five points on $R$ is order-of-magnitude fifty more blocked replies per thousand draws \emph{if} your traffic looks like our mix---but ``more refusals'' is not automatically good citizenship; could be safety, could be crabby over-blocking. We print the stat and stop.
 
 \subsection{Categorical Ablation: Harmful vs. Jailbreak}
 
-Splitting judge scores by Harmful / Jailbreak / Adversarial shows where the INT4 shift concentrates.
+Slice the judge counts by Harmful / Jailbreak / Adversarial and you see where INT4 actually moved the needle.
 
 \begin{table}[H]
 \centering
@@ -159,10 +157,10 @@ mistralai/Mistral-7B-Instruct-v0.2 & int4 & 0.180 $\pm$ 0.027 & 0.145 $\pm$ 0.02
 \label{tab:category}
 \end{table}
 
-For Mistral, jailbreak is the only column that moves: FP16 stays at zero refusals on the synthetic jailbreak set, INT4 lands near 0.15. Harmful and adversarial margins are unchanged within sampling noise. That pattern reads like a boundary shift, not a proof that INT4 ``fixed'' jailbreaks.
+Mistral: jailbreak column is the whole dance---FP16 refuses none of the $200$ synthetic jailbreak draws, INT4 refuses about $0.15$ of them. Harmful and adversarial cells sit on top of sampling noise. Reads like a boundary slide, not a comic-book ``INT4 patched jailbreaks forever'' caption.
 
 \subsection{Qualitative Drift Examples}
-Table~\ref{tab:qualitative} paraphrases one paired draw where INT4 flipped the judge label; plots elsewhere use vector graphics and color tables safe for common color-vision deficiencies.
+Table~\ref{tab:qualitative} paraphrases one paired draw where INT4 flipped the judge polarity; figures use vector PDFs and \texttt{viridis}-style ramps that survive common CVD checks.
 
 \begin{table}[H]
 \centering
@@ -180,31 +178,31 @@ Table~\ref{tab:qualitative} paraphrases one paired draw where INT4 flipped the j
 \end{table}
 
 \subsection{Failure Mode Analysis}
-Mistral under INT4 simultaneously lowers jailbreak compliance and raises aggregate refusals, which can be desirable on abusive traffic yet costly on benign prompts if the judge's ``safe'' bucket absorbs ordinary tasks. No monotone ``safer is better'' story falls out: NF4 is a different operating point. Empirically the motion localizes to Mistral and largely to jailbreak-conditioned prompts; companion families look stationary on this budget.
+INT4 Mistral both bleeds fewer jailbreak wins and pumps aggregate refusals---great on abusive traffic, ugly if benign prompts start landing in the judge's ``safe'' bucket by mistake. NF4 is just another operating point, not monotone ``more refusals = more virtue.'' Motion stays local: Mistral, mostly jailbreak-conditioned prompts; Gemma/Llama look sleepy on this budget.
 
 \section{Discussion}
-PTQ edits weights silently; end users never grant consent for that operator. Directionally, Mistral's refusal curve bends more than Gemma's or Llama's under identical prompts, yet FDR strips the star from the headline test. The defensible posture is exploratory telemetry, not a causal mechanism.
+PTQ mutates weights nobody opted into at the keyboard. Mistral's refusal curve bends harder than Gemma's or Llama's on identical prompts, yet FDR yanks the star off the headline test---so posture stays ``instrumentation + caution,'' not ``we found the causal bit that flips refusals.''
 
-Benchmark culture still rewards accuracy; refusal dashboards are immature. The Mistral MMLU/GSM8K gap we report is too shallow to explain the larger refusal step, but the sample is small. Follow-up work owes additional seeds, wider architectures, and human audits on judge failures.
+Leaderboards still worship accuracy; refusal telemetry is a cottage industry. The MMLU/GSM8K gap we show is too skinny to swallow the bigger refusal jump; sample is also small. Next passes need more seeds, more architectures, humans on judge failures.
 
-Operationally, promote INT4 builds through the same safety review queue applied to supervised finetunes rather than assuming bit-depth is neutral.
+Ship INT4 through the same safety review lane you use for SFT drops; pretending bit depth is neutral is how surprises land in prod.
 
 \section{Reproducibility Details}
-Frozen scripts, container definitions, and plotting notebooks are catalogued in \cite{gupta2026adb_artifacts}. The default evaluator pins \texttt{PYTHONHASHSEED=42}, CUDA RNG seed $42$, decode temperature $0.7$, and \texttt{max\_new\_tokens=150}; Table~\ref{tab:refusal} reflects that configuration.
+Dockerfiles, pinned seeds, notebooks: all catalogued in \cite{gupta2026adb_artifacts}. Evaluator defaults were \texttt{PYTHONHASHSEED=42}, CUDA RNG $42$, temperature $0.7$, \texttt{max\_new\_tokens=150}; Table~\ref{tab:refusal} reflects that stack.
 
 \section{Ethical Statement}
-No new jailbreak strings are published; templates revisit published categories only.
+We do not ship fresh jailbreak strings; templates recycle published threat families only.
 
 \subsection{Limitations}
-Only Mistral shows a large jailbreak swing; Gemma and Llama-3-8B stay noisy around their baselines, so the manuscript avoids ``all INT4 models'' claims. The judge is another LLM---it can share the same blind spots as the targets; cycling it in as a subject model would be the clean stress test once budget allows. Appendix~\ref{app:layerwise} begins to localize drift, but mechanistic depth is still thin. Multiple contrasts mean uncorrected $p$-values are illustrative, not ceremonial.
+Big jailbreak swing is Mistral-specific; Gemma and Llama-3-8B wobble around baseline noise, hence no ``INT4 doomed everyone'' headline. Judge is still an LLM---it can inherit the same blind spots as the targets; the honest stress test is rotating judges or paying humans once budget exists. Appendix~\ref{app:layerwise} hints where drift concentrates but stops miles short of a mechanism proof. Uncorrected $p$s in the body are mood lighting, not verdicts.
 
 \subsection{Planned Replication Experiments}
-Next hardware cycle: widen the model zoo, draw several RNG seeds per checkpoint, swap at least two INT4 backends in anger, and pay for dual human labels on $\geq 200$ stratified outputs. Success criteria are boring but necessary---tight CIs, judge--human $\kappa$ and confusion matrices sliced by category---so we can see whether Mistral's INT4 jailbreak lift survives scrutiny or was a thin-data blip.
+Next money burn: wider zoo, multiple RNG seeds per checkpoint, second INT4 backend out of politeness, dual human labels on $\geq 200$ stratified rows. Win condition is dull---tight CIs, judge--human $\kappa$, confusion matrices sliced by Harmful/Jailbreak/Adversarial---so we learn whether Mistral's INT4 jailbreak bump survives or was a thin-data burp.
 
 \section{Conclusion and Future Work}
-Under this protocol, Mistral's jailbreak slice is the visible outlier; Gemma and Llama-3-8B remain comparatively flat. Multiplicity-adjusted statistics dull the contrast ($p{=}0.16$). Products still suffer when refusals spike---support tickets rise---so refusal KPIs belong next to latency and dollar-per-token metrics.
+On the data we have, Mistral's jailbreak slice is the loud outlier; Gemma and Llama-3-8B stay visually flat. Multiplicity dulls the headline ($p{=}0.16$). Ops reality still bites when refusals spike---tickets, churn---so refusal dashboards belong beside latency and token-dollar cost.
 
-\paragraph{Informal rollout hint.} INT8 tracked FP16 in our logs; INT4 is where behavioral deltas appeared---schedule a targeted safety regression suite before promoting NF4 artifacts.
+\paragraph{Rollout nudge.} Logs say INT8 tracked FP16; INT4 is where behavior moved---run a targeted safety regression before you bless NF4 artifacts.
 
 \bibliographystyle{plain}
 \bibliography{references}
@@ -213,7 +211,7 @@ Under this protocol, Mistral's jailbreak slice is the visible outlier; Gemma and
 \section{Preliminary Layer-Wise Ablation}
 \label{app:layerwise}
 
-To investigate \emph{where} alignment drift originates inside the transformer stack, we conduct a preliminary ablation on Mistral-7B-Instruct-v0.2 in which we selectively quantize only the MLP layers or only the Attention layers to INT4 while keeping the remaining layers at FP16.
+We hacked Mistral-7B-Instruct-v0.2 so only attention blocks or only MLP blocks saw INT4 while everything else stayed FP16---cheap geography lesson before anyone asks ``where did the logits move?''
 
 \begin{table}[H]
 \centering
@@ -231,7 +229,7 @@ Full INT4 & 0.204 $\pm$ 0.017 & +0.053 & 60.1\% \\
 \label{tab:layerwise}
 \end{table}
 
-MLP-only INT4 recovers most of the full-model refusal delta ($\Delta R = 0.043$ of $0.053$, i.e.\ $\sim$81\%); attention-only contributes less ($\sim$32\%) and the percentages do not add cleanly---likely interaction. Interpretation stays speculative: FFN blocks are big and heavily RLHF-touched, so coarse 4-bit buckets could disturb refusal logits first, but we stop short of a mechanistic theorem.
+MLP-only INT4 eats most of the full-model refusal bump ($\Delta R = 0.043$ of $0.053$, i.e.\ $\sim$81\%); attention-only is smaller ($\sim$32\%) and the pieces do not add linearly---interaction, probably. Story stays speculative: FFNs are fat and RLHF-scarred, so coarse 4-bit buckets might jiggle refusal logits first, but this is not a theorem.
 
 \section{Preliminary INT4 Backend Comparison (Inconclusive)}
 \label{app:backend_robustness}
