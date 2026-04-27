@@ -9,7 +9,7 @@
 [![Python](https://img.shields.io/badge/python-3.10%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.0%2B-EE4C2C?logo=pytorch&logoColor=white)](https://pytorch.org/)
 [![HF](https://img.shields.io/badge/models-Hugging%20Face-yellow?logo=huggingface)](https://huggingface.co/)
-[![Paper](https://img.shields.io/badge/paper-paper%2Fpaper.tex-459598?logo=latex&logoColor=white)](paper/paper.tex)
+[![Paper](https://img.shields.io/badge/paper-paper%2Fpaper.pdf-459598?logo=latex&logoColor=white)](paper/paper.pdf)
 
 </div>
 
@@ -65,7 +65,7 @@ flowchart TB
   end
 
   subgraph PUB["Publication"]
-    T["paper/paper.tex"]
+    T["paper/paper.pdf"]
   end
 
   P --> E
@@ -122,7 +122,7 @@ Dry run (cap prompts): `MAX_PROMPTS=5 bash scripts/run_v2_matrix.sh` · Mistral-
 | Per-run generations + metadata | `evaluation/logs/results_*.csv` |
 | Refusal / drift / margin summaries | `analysis/refusal_summary.csv`, `drift_summary.csv`, `margin_summary.csv` |
 | Completeness audit | `analysis/refusal_coverage.csv`, `drift_coverage.csv`, `margin_coverage.csv` |
-| Plots | `figures/` (e.g. heatmap, violin, safety–utility overlay—see `paper/paper.tex`) |
+| Plots | `figures/` (e.g. heatmap, violin, safety–utility overlay—see `paper/paper.pdf`) |
 | Frozen numeric scratchpad | `paper/results_headline_summary.txt` |
 | Manuscript (LaTeX) | `paper/paper.tex` · arXiv bundle: `bash scripts/package_arxiv.sh` → `paper/arxiv_submission/arxiv_source.tar.gz` |
 | Manuscript (PDF) | `paper/paper.pdf` — build locally with LaTeX (see [Building the PDF](#building-the-pdf)) |
