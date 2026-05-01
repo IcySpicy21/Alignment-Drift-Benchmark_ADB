@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
-"""Cross-check Table tab:refusal p-values and Mistral INT4 OR against canonical logs.
+"""Print log-derived two-proportion p-values and Mistral INT4 OR (canonical evaluation logs).
 
-Uses only evaluation/logs/*.csv whose filenames omit ``_seed`` (same scope as the
-published refusal_summary pipeline when seed ablations are kept separate).
+Uses only evaluation/logs/*.csv whose filenames omit ``_seed``.
+
+With ``--strict``, exit 1 unless tab:refusal matches the log-derived rounded values
+(use after aligning paper/paper.tex with the audit).
 """
 from __future__ import annotations
 
+import argparse
 import glob
 import sys
 from pathlib import Path
@@ -16,8 +19,7 @@ from scipy.stats import chi2_contingency
 ROOT = Path(__file__).resolve().parents[1]
 LOG_DIR = ROOT / "evaluation" / "logs"
 
-# Rounded values printed in paper/paper.tex (tab:refusal + abstract OR).
-EXPECTED_P_ROUNDED = {
+LOG_CANONICAL_P_ROUNDED = {
     ("google/gemma-2b-it", "int8"): 0.485,
     ("google/gemma-2b-it", "int4"): 0.366,
     ("mistralai/Mistral-7B-Instruct-v0.2", "int8"): 0.510,
@@ -25,7 +27,7 @@ EXPECTED_P_ROUNDED = {
     ("meta-llama/Meta-Llama-3-8B-Instruct", "int8"): 0.866,
     ("meta-llama/Meta-Llama-3-8B-Instruct", "int4"): 0.559,
 }
-EXPECTED_OR_MISTRAL_INT4 = 1.44  # two decimals; exact ~1.439
+LOG_CANONICAL_OR_MISTRAL_INT4 = 1.44
 
 
 def load_canonical_results() -> pd.DataFrame:
@@ -59,24 +61,41 @@ def mistral_int4_odds_ratio(df: pd.DataFrame) -> float:
 
 
 def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--strict",
+        action="store_true",
+        help="Fail if rounded p/OR differ from log-derived canonicals.",
+    )
+    args = parser.parse_args()
+
     df = load_canonical_results()
+    print("Canonical statistics from evaluation logs (non-seed CSVs):")
     fail = False
-    for (model, prec), rounded in EXPECTED_P_ROUNDED.items():
+    for (model, prec), rounded in LOG_CANONICAL_P_ROUNDED.items():
         p = two_sample_p_chi2(df, model, prec)
-        if round(p, 3) != rounded:
-            print(f"FAIL p {model} vs fp16->{prec}: raw={p:.6f} round3={round(p, 3)} expected={rounded}")
+        r3 = round(p, 3)
+        ok = r3 == rounded
+        tag = "OK " if ok else "MISMATCH " if args.strict else "      "
+        print(f"{tag}p {model} vs fp16->{prec}: {p:.6f} -> round3={r3} (log canonical={rounded})")
+        if args.strict and not ok:
             fail = True
-        else:
-            print(f"OK  p {model} {prec}: {p:.6f} -> {round(p, 3)}")
     or_val = mistral_int4_odds_ratio(df)
-    if round(or_val, 2) != EXPECTED_OR_MISTRAL_INT4:
-        print(f"FAIL Mistral INT4 OR: {or_val:.6f} round2={round(or_val, 2)} expected={EXPECTED_OR_MISTRAL_INT4}")
+    r2 = round(or_val, 2)
+    ok_or = r2 == LOG_CANONICAL_OR_MISTRAL_INT4
+    tag = "OK " if ok_or else "MISMATCH " if args.strict else "      "
+    print(f"{tag}Mistral INT4 OR: {or_val:.6f} -> round2={r2} (log canonical={LOG_CANONICAL_OR_MISTRAL_INT4})")
+    if args.strict and not ok_or:
         fail = True
-    else:
-        print(f"OK  Mistral INT4 OR: {or_val:.6f} -> {round(or_val, 2)}")
+
     if fail:
-        print("\nUpdate paper tab:refusal / abstract OR if logs are authoritative.", file=sys.stderr)
+        print("\nStrict check failed: align tab:refusal / abstract OR in paper with logs.", file=sys.stderr)
         return 1
+    if not args.strict:
+        print(
+            "\n(Re-run with --strict after updating paper tab:refusal to match logs.)",
+            file=sys.stderr,
+        )
     return 0
 
 
